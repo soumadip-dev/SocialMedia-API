@@ -1,5 +1,5 @@
 <h1 align="center">
-  MultiVendor-Ecommerce-Next-PERN 🛍️
+  MultiVendor-Ecommerce 🛍️
 </h1>
 
 <p align="center">
