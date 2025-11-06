@@ -17,7 +17,7 @@ const uN7: UserN7 = {
 const idValueN7 = getUserPropN7(uN7, 'id');
 console.log(idValueN7);
 
-function setUserPropN7<T, K extends keyof T>(objN7: T, keyN7: K, newVal: T[k]): void {
+function setUserPropN7<T, K extends keyof T>(objN7: T, keyN7: K, newVal: T[K]): void {
   objN7[keyN7] = newVal;
 }
 
