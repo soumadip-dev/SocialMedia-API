@@ -1,9 +1,9 @@
 <h1 align="center">
-  MultiVendor-Ecommerce 🛍️
+  FullStack AI Voice Agent 🎤
 </h1>
 
 <p align="center">
-Full-stack multi-vendor e-commerce platform built with Next.js and PERN.
+Real-time AI interview agent built with Next.js, Firebase, and VAPI for live voice interaction.
 </p>
 
 <p align="center">
