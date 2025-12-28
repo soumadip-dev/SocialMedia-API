@@ -227,9 +227,6 @@ const logoutUser = async (req: Request, res: Response<MessageResponse | ErrorRes
     return res.status(200).json({
       message: 'Logged out successfully!',
       success: true,
-      data: {
-        message: 'Refresh token has been revoked. Please clear client-side tokens.',
-      },
     });
   } catch (error) {
     logger.error('Error during user logout ❌', error);

@@ -1,4 +1,4 @@
-<h1 align="center">SocialMedia-API 🔗 </h1>
+<h1 align="center">SocialMedia-API 🔗</h1>
 
 <p align="center">
   A scalable social media backend service built with Express.js, Redis, and modern tools, featuring rate limiting and a microservice architecture.
@@ -41,11 +41,11 @@
 ## ⚙️ Tech Stack
 
 - **🧠 Framework**: Express.js
-- **🗄️ Primary Database**: MongoDb with Mongoose ORM
+- **🗄️ Primary Database**: MongoDB with Mongoose ORM
 - **⚡ Caching**: Redis
 - **📊 Monitoring**: Winston for logging
 - **🔒 Security**: Helmet, CORS, rate limiting
-- **🪪 validation**: joy
+- **🪪 Validation**: Joi
 - **🐳 Containerization**: Docker & Docker Compose
 
 ---
@@ -56,6 +56,7 @@
 
 - Node.js (v18 or higher)
 - Redis (v7+)
+- MongoDB (v6+)
 - Docker & Docker Compose (optional)
 
 ### 1. Clone the Repository
@@ -67,33 +68,37 @@ cd SocialMedia-API
 
 ### 2. Environment Configuration
 
-Create a `.env` file in the api-gateway folder:
+Create a `.env` file in the `api-gateway` folder:
 
 ```env
 PORT=8080
 NODE_ENV=development
 IDENTITY_SERVICE_URL=http://localhost:8081
 REDIS_URL=redis://localhost:6379
-FRONTEND_URL=<YOUR FRONTEND URL>
+FRONTEND_URL=<YOUR_FRONTEND_URL>
 ```
 
-Create a `.env` file in the identity-service folder:
+Create a `.env` file in the `identity-service` folder:
 
 ```env
 NODE_ENV=development
 PORT=8081
-MONGO_URI=<YOUR MONGODB URL>
-JWT_SECRET=<YOUR JWT SECRET>
-FRONTEND_URL=<YOUR FRONTEND URL>
+MONGO_URI=<YOUR_MONGODB_URL>
+JWT_SECRET=<YOUR_JWT_SECRET>
+FRONTEND_URL=<YOUR_FRONTEND_URL>
 REDIS_URL=redis://localhost:6379
 ```
+
+---
 
 ## 🚀 API Endpoints
 
 ### Authentication
 
-- `POST /api/v1/auth/register` - Register new user
-- `POST /api/v1/auth/login` - Login user
+- `POST /api/v1/auth/register` – Register new user
+- `POST /api/v1/auth/login` – Login user
+- `POST /api/v1/auth/refresh-token` – Refresh access token
+- `POST /api/v1/auth/logout` – Logout user
 
 ---
 
