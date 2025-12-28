@@ -77,6 +77,7 @@ app.get('/', (req: Request, res: Response<MessageResponse>) => {
 
 // apply the sensetiveEndPointLimiter to our routes
 app.use('/api/auth/register', sensitiveEndpointsLimiter);
+app.use('/api/auth/login', sensitiveEndpointsLimiter);
 
 // Routes
 app.use('/api/health', healthRoutes);

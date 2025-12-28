@@ -42,8 +42,7 @@
 
 - **🧠 Framework**: Express.js
 - **🗄️ Primary Database**: MongoDb with Mongoose ORM
-- **⚡ Caching & Pub/Sub**: Redis
-- **📨 Real-time Communication**: Socket.io
+- **⚡ Caching**: Redis
 - **📊 Monitoring**: Winston for logging
 - **🔒 Security**: Helmet, CORS, rate limiting
 - **🪪 validation**: joy
@@ -78,7 +77,7 @@ REDIS_URL=redis://localhost:6379
 FRONTEND_URL=<YOUR FRONTEND URL>
 ```
 
-Create a `.env` file in the api-gateway folder:
+Create a `.env` file in the identity-service folder:
 
 ```env
 NODE_ENV=development
@@ -94,9 +93,10 @@ REDIS_URL=redis://localhost:6379
 ### Authentication
 
 - `POST /api/v1/auth/register` - Register new user
+- `POST /api/v1/auth/login` - Login user
 
 ---
 
 <p align="center">
-  Made with ❤️ by Your Name
+  Made with ❤️ by Soumadip Majila
 </p>

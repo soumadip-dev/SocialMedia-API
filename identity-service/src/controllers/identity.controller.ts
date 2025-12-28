@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import type { MessageResponse } from '../interfaces/message-response';
 import type { ErrorResponse } from '../interfaces/error-response';
 import logger from '../utils/logger.utils';
-import { validateRegister } from '../utils/validation.utils';
+import { validateLogin, validateRegister } from '../utils/validation.utils';
 import { User } from '../models/User.model';
 import generateTokens from '../utils/generateToken.utils';
 
@@ -45,7 +45,7 @@ const registerUser = async (req: Request, res: Response<MessageResponse | ErrorR
     return res.status(201).json({
       message: 'User registered successfully!',
       success: true,
-      data: { acccessToken, refreshToken },
+      data: { acccessToken, refreshToken, userId: user._id },
     });
   } catch (error) {
     logger.error('Error during user registration ❌', error); // Log unexpected errors
@@ -58,9 +58,72 @@ const registerUser = async (req: Request, res: Response<MessageResponse | ErrorR
 };
 
 //* Controller to login user
+const loginUser = async (req: Request, res: Response<MessageResponse | ErrorResponse>) => {
+  logger.info('Login endpoint hit 🎯');
+  try {
+    // Validate incoming request body
+    const { error } = validateLogin(req.body);
+
+    if (error) {
+      logger.warn(`Validation error: ${error.details[0].message} ⚠️`);
+      return res.status(400).json({
+        success: false,
+        message: error.details[0].message,
+      });
+    }
+
+    const { email, password } = req.body;
+
+    // Check if user exists
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      logger.warn(`Login failed: User with email "${email}" not found 🚫`);
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password',
+      });
+    }
+
+    // Validate password
+    const isValidPassword = await user.comparePassword(password);
+
+    if (!isValidPassword) {
+      logger.warn(`Login failed: Invalid password for user with email "${email}" 🚫`);
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password',
+      });
+    }
+
+    // Generate access and refresh tokens
+    const { acccessToken, refreshToken } = await generateTokens(user);
+
+    logger.info(`User logged in successfully with ID: ${user._id} ✅`);
+
+    return res.status(200).json({
+      message: 'Login successful!',
+      success: true,
+      data: {
+        acccessToken,
+        refreshToken,
+        userId: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    logger.error('Error during user login ❌', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Login failed due to server error',
+      errors: error instanceof Error ? [error.message] : undefined,
+    });
+  }
+};
 
 //* Controller to refresh token
 
 //* Controller for logout
 
-export { registerUser };
+export { registerUser, loginUser };

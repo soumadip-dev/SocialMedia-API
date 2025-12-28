@@ -5,6 +5,10 @@ interface RegisterDTO {
   email: string;
   password: string;
 }
+interface LoginDTO {
+  email: string;
+  password: string;
+}
 
 const validateRegister = (data: RegisterDTO): ValidationResult => {
   const schema = Joi.object<RegisterDTO>({
@@ -16,4 +20,12 @@ const validateRegister = (data: RegisterDTO): ValidationResult => {
   return schema.validate(data);
 };
 
-export { validateRegister };
+const validateLogin = (data: LoginDTO): ValidationResult => {
+  const schema = Joi.object<LoginDTO>({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+  });
+  return schema.validate(data);
+};
+
+export { validateRegister, validateLogin };
