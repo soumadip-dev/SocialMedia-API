@@ -1,23 +1,17 @@
 import dotenv from 'dotenv';
-
 dotenv.config();
 
-// Allowed Node.js environments
 type NodeEnv = 'development' | 'production' | 'test';
+const NODE_ENVS: NodeEnv[] = ['development', 'production', 'test'];
 
-const port = Number(process.env.PORT);
+const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
+const NODE_ENV: NodeEnv = NODE_ENVS.includes(process.env.NODE_ENV as NodeEnv)
+  ? (process.env.NODE_ENV as NodeEnv)
+  : 'development';
 
-// Centralized environment configuration
-export const ENV: {
-  PORT: number;
-  NODE_ENV: NodeEnv;
-} = {
-  PORT: Number.isNaN(port) ? 8080 : port,
-
-  NODE_ENV:
-    process.env.NODE_ENV === 'development' ||
-    process.env.NODE_ENV === 'production' ||
-    process.env.NODE_ENV === 'test'
-      ? process.env.NODE_ENV
-      : 'development',
+export const ENV = {
+  PORT,
+  NODE_ENV,
+  REDIS_URL: process.env.REDIS_URL ?? 'redis://localhost:6379',
+  IDENTITY_SERVICE_URL: process.env.IDENTITY_SERVICE_URL ?? 'http://localhost:8081',
 };
