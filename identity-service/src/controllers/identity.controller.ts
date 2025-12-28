@@ -5,6 +5,7 @@ import logger from '../utils/logger.utils';
 import { validateLogin, validateRegister } from '../utils/validation.utils';
 import { User } from '../models/User.model';
 import generateTokens from '../utils/generateToken.utils';
+import { RefreshToken } from '../models/RefreshToken.model';
 
 //* Controller to register user
 const registerUser = async (req: Request, res: Response<MessageResponse | ErrorResponse>) => {
@@ -108,8 +109,6 @@ const loginUser = async (req: Request, res: Response<MessageResponse | ErrorResp
         acccessToken,
         refreshToken,
         userId: user._id,
-        username: user.username,
-        email: user.email,
       },
     });
   } catch (error) {
@@ -123,7 +122,79 @@ const loginUser = async (req: Request, res: Response<MessageResponse | ErrorResp
 };
 
 //* Controller to refresh token
+const refreshTokenUser = async (req: Request, res: Response<MessageResponse | ErrorResponse>) => {
+  logger.info('Refresh token endpoint hit 🎯');
+  try {
+    const { refreshToken } = req.body;
+
+    // Validate refresh token presence
+    if (!refreshToken) {
+      logger.warn('Refresh token refresh failed: Refresh token is missing 🚫');
+      return res.status(400).json({
+        success: false,
+        message: 'Refresh token is required',
+      });
+    }
+
+    // Find the stored refresh token
+    const storedToken = await RefreshToken.findOne({ token: refreshToken });
+
+    // Check if token exists and is not expired
+    if (!storedToken) {
+      logger.warn(`Refresh token refresh failed: Invalid refresh token 🚫`);
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid refresh token',
+      });
+    }
+
+    if (storedToken.expiresAt < new Date()) {
+      logger.warn(`Refresh token refresh failed: Refresh token has expired 🚫`);
+      return res.status(401).json({
+        success: false,
+        message: 'Refresh token has expired',
+      });
+    }
+
+    // Find the user associated with the refresh token
+    const user = await User.findById(storedToken.user);
+
+    if (!user) {
+      logger.warn(`Refresh token refresh failed: User not found 🚫`);
+      return res.status(401).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    // Generate new access and refresh tokens
+    const { acccessToken: newAccessToken, refreshToken: newRefreshToken } = await generateTokens(
+      user
+    );
+
+    // Delete the old refresh token
+    await RefreshToken.deleteOne({ _id: storedToken._id });
+
+    logger.info(`Tokens refreshed successfully for user ID: ${user._id} ✅`);
+
+    return res.status(200).json({
+      message: 'Tokens refreshed successfully!',
+      success: true,
+      data: {
+        acccessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      },
+    });
+  } catch (error) {
+    logger.error('Error during token refresh ❌', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Token refresh failed due to server error',
+      errors: error instanceof Error ? [error.message] : undefined,
+    });
+  }
+};
 
 //* Controller for logout
 
-export { registerUser, loginUser };
+export { registerUser, loginUser, refreshTokenUser };
