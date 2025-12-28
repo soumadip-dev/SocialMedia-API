@@ -18,9 +18,9 @@ const logger: Logger = winston.createLogger({
       format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
     }),
     // Log only error-level messages to a file called error.log
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'identity-service-error.log', level: 'error' }),
     // Log all messages (info, warn, error, etc.) to combined.log
-    new winston.transports.File({ filename: 'combined.log' }),
+    new winston.transports.File({ filename: 'identity-service-combined.log' }),
   ],
 });
 
