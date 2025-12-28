@@ -1,10 +1,16 @@
 import { Router } from 'express';
-import { loginUser, refreshTokenUser, registerUser } from '../controllers/identity.controller';
+import {
+  loginUser,
+  logoutUser,
+  refreshTokenUser,
+  registerUser,
+} from '../controllers/identity.controller';
 
 const router = Router();
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/refresh-token', refreshTokenUser);
+router.post('/logout', logoutUser);
 
 export default router;

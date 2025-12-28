@@ -196,5 +196,49 @@ const refreshTokenUser = async (req: Request, res: Response<MessageResponse | Er
 };
 
 //* Controller for logout
+const logoutUser = async (req: Request, res: Response<MessageResponse | ErrorResponse>) => {
+  logger.info('Logout endpoint hit 🎯');
+  try {
+    const { refreshToken } = req.body;
 
-export { registerUser, loginUser, refreshTokenUser };
+    // Validate refresh token presence
+    if (!refreshToken) {
+      logger.warn('Logout failed: Refresh token is missing 🚫');
+      return res.status(400).json({
+        success: false,
+        message: 'Refresh token is required',
+      });
+    }
+
+    // Delete the refresh token from the database
+    const result = await RefreshToken.deleteOne({ token: refreshToken });
+
+    // Check if token was actually deleted (exists in database)
+    if (result.deletedCount === 0) {
+      logger.warn('Logout failed: Invalid or already revoked refresh token 🚫');
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or already revoked refresh token',
+      });
+    }
+
+    logger.info(`User logged out successfully. Refresh token deleted ✅`);
+
+    return res.status(200).json({
+      message: 'Logged out successfully!',
+      success: true,
+      data: {
+        message: 'Refresh token has been revoked. Please clear client-side tokens.',
+      },
+    });
+  } catch (error) {
+    logger.error('Error during user logout ❌', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Logout failed due to server error',
+      errors: error instanceof Error ? [error.message] : undefined,
+    });
+  }
+};
+
+export { registerUser, loginUser, refreshTokenUser, logoutUser };
