@@ -21,20 +21,25 @@ const app: Express = express();
 const redisClient = new Redis(ENV.REDIS_URL); // Connection is established to a Redis server using ioredis.
 
 // Ip based rate limiting for sensitive endpoints
-const sensitiveEndpointsLimiter: RateLimitRequestHandler = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 50,
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req: Request, res: Response<ErrorResponse>) => {
-    logger.warn(`Sensitive endpoint rate limit exceeded for IP: ${req.ip} 🚫`);
-    res.status(429).json({ message: 'Too many request', success: false });
-  },
-  store: new RedisStore({
-    // @ts-expect-error
-    sendCommand: (...args: string[]) => redisClient.call(...args),
-  }),
-});
+function buildIpRateLimiter(windowMs: number, maxRequests: number): RateLimitRequestHandler {
+  return rateLimit({
+    windowMs,
+    max: maxRequests,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req: Request, res: Response<ErrorResponse>) => {
+      logger.warn(`Rate limit exceeded for IP: ${req.ip}`);
+      res.status(429).json({
+        success: false,
+        message: 'Too many requests',
+      });
+    },
+    store: new RedisStore({
+      // @ts-expect-error
+      sendCommand: (...args: string[]) => redisClient.call(...args),
+    }),
+  });
+}
 
 // Global middlewares
 app.use(morgan('dev'));
@@ -75,9 +80,10 @@ app.get('/', (req: Request, res: Response<MessageResponse>) => {
   });
 });
 
-// apply the sensetiveEndPointLimiter to our routes
-app.use('/api/auth/register', sensitiveEndpointsLimiter);
-app.use('/api/auth/login', sensitiveEndpointsLimiter);
+// Register: 5 requests per 15 minutes
+app.use('/api/auth/register', buildIpRateLimiter(15 * 60 * 1000, 5));
+// Login: 10 requests per 15 minutes
+app.use('/api/auth/login', buildIpRateLimiter(15 * 60 * 1000, 10));
 
 // Routes
 app.use('/api/health', healthRoutes);

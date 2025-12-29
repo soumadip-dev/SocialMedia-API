@@ -1,4 +1,5 @@
 import app from './app.js';
+import { connectDB } from './config/db.config.js';
 import { ENV } from './config/env.config.js';
 import logger from './utils/logger.utils.js';
 
@@ -10,6 +11,8 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 const startServer = async () => {
+  connectDB();
+
   // Start the server
   const server = app.listen(PORT, () => {
     logger.info(`Post service running on http://localhost:${PORT} 🌐`);

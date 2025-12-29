@@ -14,26 +14,32 @@ import configureCors from './config/cors.config.js';
 import logger from './utils/logger.utils.js';
 import { ENV } from './config/env.config.js';
 import errorHandler from './middlewares/error.middlewares';
+import postRoutes from './routes/post.routes';
 
 const app: Express = express();
 
 const redisClient = new Redis(ENV.REDIS_URL); // Connection is established to a Redis server using ioredis.
 
 // Ip based rate limiting for sensitive endpoints
-const sensitiveEndpointsLimiter: RateLimitRequestHandler = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 50,
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req: Request, res: Response<ErrorResponse>) => {
-    logger.warn(`Sensitive endpoint rate limit exceeded for IP: ${req.ip} 🚫`);
-    res.status(429).json({ message: 'Too many request', success: false });
-  },
-  store: new RedisStore({
-    // @ts-expect-error
-    sendCommand: (...args: string[]) => redisClient.call(...args),
-  }),
-});
+function buildIpRateLimiter(windowMs: number, maxRequests: number): RateLimitRequestHandler {
+  return rateLimit({
+    windowMs,
+    max: maxRequests,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req: Request, res: Response<ErrorResponse>) => {
+      logger.warn(`Sensitive endpoint rate limit exceeded for IP: ${req.ip}`);
+      res.status(429).json({
+        success: false,
+        message: 'Too many requests',
+      });
+    },
+    store: new RedisStore({
+      // @ts-expect-error
+      sendCommand: (...args: string[]) => redisClient.call(...args),
+    }),
+  });
+}
 
 // Global middlewares
 app.use(morgan('dev'));
@@ -74,12 +80,18 @@ app.get('/', (req: Request, res: Response<MessageResponse>) => {
   });
 });
 
-// apply the sensetiveEndPointLimiter to our routes
-// app.use('/api/auth/register', sensitiveEndpointsLimiter);
-// app.use('/api/auth/login', sensitiveEndpointsLimiter);
+// Create post: 10 requests per 15 minutes
+app.use('/api/auth/create-post', buildIpRateLimiter(15 * 60 * 1000, 10));
 
 // Routes
 app.use('/api/health', healthRoutes);
+app.use(
+  '/api/post',
+  (req: Request, res: Response, next: NextFunction) => {
+    req.redisClient = redisClient;
+  },
+  postRoutes
+);
 
 app.use(errorHandler);
 

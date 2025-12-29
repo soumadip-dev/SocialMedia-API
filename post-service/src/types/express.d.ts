@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import Redis from 'ioredis';
 
 declare global {
   namespace Express {
@@ -6,6 +7,7 @@ declare global {
       user?: {
         userId: string | string[];
       };
+      redisClient?: Redis;
     }
   }
 }
