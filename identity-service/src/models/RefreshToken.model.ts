@@ -1,7 +1,7 @@
-import mongoose, { type Model } from 'mongoose';
+import mongoose, { type Model, Document } from 'mongoose';
 
 //* Interface representing a RefreshToken document
-interface IRefreshToken {
+interface IRefreshToken extends Document {
   token: string;
   user: mongoose.Types.ObjectId;
   expiresAt: Date;
@@ -28,7 +28,6 @@ const refreshTokenSchema = new mongoose.Schema<IRefreshToken>(
   { timestamps: true }
 );
 
-//*
 refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 //*  Mongoose model for RefreshToken

@@ -49,10 +49,10 @@ userSchema.methods.comparePassword = async function (candidatePassword: string) 
   }
 };
 
-//*Create a text index on the username field for efficient text search
+//* Create a text index on the username field for efficient text search
 userSchema.index({ username: 'text' });
 
 //* Mongoose model for User
-const User: Model<IUser> = mongoose.model<IUser>('User', userSchema);
+const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
 
 export { User, IUser };

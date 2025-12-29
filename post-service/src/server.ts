@@ -12,7 +12,7 @@ process.on('unhandledRejection', (reason, promise) => {
 const startServer = async () => {
   // Start the server
   const server = app.listen(PORT, () => {
-    logger.info(`Identity service running on http://localhost:${PORT} 🌐`);
+    logger.info(`Post service running on http://localhost:${PORT} 🌐`);
   });
 
   // Handle server errors
