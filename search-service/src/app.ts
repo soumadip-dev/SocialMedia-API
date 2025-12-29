@@ -10,7 +10,6 @@ import { RateLimiterRedis } from 'rate-limiter-flexible';
 import RedisStore from 'rate-limit-redis';
 
 import healthRoutes from './routes/health.routes.js';
-import identityRoutes from './routes/identity.routes';
 import configureCors from './config/cors.config.js';
 import logger from './utils/logger.utils.js';
 import { ENV } from './config/env.config.js';
@@ -70,18 +69,17 @@ app.use((req: Request, res: Response<ErrorResponse>, next: NextFunction) => {
 // Home route
 app.get('/', (req: Request, res: Response<MessageResponse>) => {
   res.status(200).json({
-    message: 'Home route of the identity service is running 🏚️',
+    message: 'Home route of the search service is running 🏚️',
     success: true,
   });
 });
 
 // apply the sensetiveEndPointLimiter to our routes
-app.use('/api/auth/register', sensitiveEndpointsLimiter);
-app.use('/api/auth/login', sensitiveEndpointsLimiter);
+// app.use('/api/auth/register', sensitiveEndpointsLimiter);
+// app.use('/api/auth/login', sensitiveEndpointsLimiter);
 
 // Routes
 app.use('/api/health', healthRoutes);
-app.use('/api/auth', identityRoutes);
 
 app.use(errorHandler);
 
