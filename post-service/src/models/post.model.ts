@@ -4,7 +4,7 @@ import mongoose, { type Model, Document } from 'mongoose';
 interface IPost extends Document {
   user: mongoose.Types.ObjectId;
   content: string;
-  mediaUrls: string[];
+  mediaIds: string[];
   createdAt: Date;
 }
 
@@ -20,7 +20,7 @@ const postSchema = new mongoose.Schema<IPost>(
       type: String,
       required: true,
     },
-    mediaUrls: [
+    mediaIds: [
       {
         type: String,
       },
