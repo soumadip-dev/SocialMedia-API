@@ -3,11 +3,23 @@ import type { MessageResponse } from '../interfaces/message-response';
 import type { ErrorResponse } from '../interfaces/error-response';
 import logger from '../utils/logger.utils';
 import { Post } from '../models/post.model';
+import { validatePost } from '../utils/validation.utils';
 
 //* Controller to create a post
 const createPost = async (req: Request, res: Response<MessageResponse | ErrorResponse>) => {
   logger.info('Post creation endpoint hit 🎯');
   try {
+    // Validate incoming request body
+    const { error } = validatePost(req.body);
+
+    if (error) {
+      logger.warn(`Validation error: ${error.details[0].message} ⚠️`);
+      return res.status(400).json({
+        success: false,
+        message: error.details[0].message,
+      });
+    }
+
     const { content, mediaIds } = req.body;
     const newlyCreatedPost = new Post({
       user: req.user?.userId,

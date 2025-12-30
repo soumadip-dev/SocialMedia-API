@@ -89,6 +89,7 @@ app.use(
   '/api/post',
   (req: Request, res: Response, next: NextFunction) => {
     req.redisClient = redisClient;
+    next();
   },
   postRoutes
 );

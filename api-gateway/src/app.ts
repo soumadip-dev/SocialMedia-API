@@ -15,6 +15,7 @@ import { ENV } from './config/env.config.js';
 import errorHandler from './middleware/error.middlewares.js';
 import logger from './utils/logger.utils.js';
 import { ErrorResponse } from './interfaces/error-response.js';
+import { validateToken } from './middleware/auth.middleware.js';
 
 const app: Express = express();
 
@@ -80,6 +81,25 @@ app.use(
     },
     userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
       logger.info(`Response received from Identity service : ${proxyRes.statusCode}`);
+
+      return proxyResData;
+    },
+  })
+);
+
+//* Setting up proxy for our post service
+app.use(
+  '/v1/post',
+  validateToken,
+  proxy(ENV.POST_SERVICE_URL, {
+    ...proxyOptions,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      proxyReqOpts.headers['Content-Type'] = 'application/json';
+      proxyReqOpts.headers['x-user-id'] = srcReq.user.userId;
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      logger.info(`Response received from Post service : ${proxyRes.statusCode}`);
 
       return proxyResData;
     },

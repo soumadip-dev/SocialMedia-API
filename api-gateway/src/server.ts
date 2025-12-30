@@ -7,7 +7,8 @@ const PORT = ENV.PORT;
 // Start server
 const server = app.listen(PORT, () => {
   logger.info(`API Gateway running on http://localhost:${PORT} 🌐`);
-  logger.info(`Identity service is running on ${ENV.IDENTITY_SERVICE_URL}`);
+  logger.info(`Identity service is running on ${ENV.IDENTITY_SERVICE_URL} 🪪`);
+  logger.info(`Post service is running on ${ENV.POST_SERVICE_URL} 📤`);
   logger.info(`Redis URl: ${ENV.REDIS_URL}`);
 });
 
