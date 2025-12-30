@@ -16,7 +16,7 @@ const generateTokens = async (user: IUser): Promise<Tokens> => {
       username: user.username,
     },
     ENV.JWT_SECRET,
-    { expiresIn: '15m' }
+    { expiresIn: '60m' }
   );
 
   const refreshToken = crypto.randomBytes(40).toString('hex');

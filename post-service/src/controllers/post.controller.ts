@@ -4,6 +4,7 @@ import type { ErrorResponse } from '../interfaces/error-response';
 import logger from '../utils/logger.utils';
 import { Post } from '../models/post.model';
 import { validatePost } from '../utils/validation.utils';
+import { invalidatePostsCache } from '../utils/redis-cache.utils';
 
 //* Controller to create a post
 const createPost = async (req: Request, res: Response<MessageResponse | ErrorResponse>) => {
@@ -28,6 +29,8 @@ const createPost = async (req: Request, res: Response<MessageResponse | ErrorRes
     });
 
     await newlyCreatedPost.save();
+
+    await invalidatePostsCache(req, newlyCreatedPost._id.toString());
 
     logger.info(`Post created Successfully ${newlyCreatedPost} ✅ `);
 
