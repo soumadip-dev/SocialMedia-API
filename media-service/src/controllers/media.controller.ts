@@ -51,7 +51,7 @@ const uploadMedia = async (req: Request, res: Response<MessageResponse | ErrorRe
   } catch (error) {
     logger.error('Error occurred while uploading media ❌', error);
     return res.status(500).json({
-      message: 'Post creation failed due to a server error',
+      message: 'Media upload failed due to a server error',
       success: false,
       errors: error instanceof Error ? [error.message] : undefined,
     });
@@ -85,7 +85,7 @@ const getAllMedias = async (req: Request, res: Response<MessageResponse | ErrorR
   } catch (error) {
     logger.error('❌ Failed to fetch medias due to an error', error);
     return res.status(500).json({
-      message: 'Post creation failed due to a server error',
+      message: 'Fetching medias failed due to a server error',
       success: false,
       errors: error instanceof Error ? [error.message] : undefined,
     });
