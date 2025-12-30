@@ -70,7 +70,7 @@ const proxyOptions = {
   },
 };
 
-//* Setting up proxy for our identity service
+//* Setting up proxy for identity service
 app.use(
   '/v1/auth',
   proxy(ENV.IDENTITY_SERVICE_URL, {
@@ -87,7 +87,7 @@ app.use(
   })
 );
 
-//* Setting up proxy for our post service
+//* Setting up proxy for post service
 app.use(
   '/v1/post',
   validateToken,
@@ -103,6 +103,32 @@ app.use(
 
       return proxyResData;
     },
+  })
+);
+
+//* Setting up proxy for media service
+app.use(
+  '/v1/media',
+  validateToken,
+  proxy(ENV.MEDIA_SERVICE_URL, {
+    ...proxyOptions,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      proxyReqOpts.headers['x-user-id'] = srcReq.user.userId;
+      if (
+        srcReq.headers['content-type'] &&
+        !srcReq.headers['content-type'].startsWith('multipart/form-data')
+      ) {
+        proxyReqOpts.headers['Content-Type'] = 'application/json';
+      }
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      logger.info(`Response received from Media service : ${proxyRes.statusCode}`);
+
+      return proxyResData;
+    },
+    // @ts-ignore
+    parseReqBody: false,
   })
 );
 

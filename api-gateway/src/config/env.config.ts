@@ -11,8 +11,8 @@ export const ENV = {
   REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
   IDENTITY_SERVICE_URL: process.env.IDENTITY_SERVICE_URL || 'http://localhost:8081',
   POST_SERVICE_URL: process.env.POST_SERVICE_URL || 'http://localhost:8083',
-  MEDIA_SERVICE_URL: process.env.POST_SERVICE_URL || 'http://localhost:8082',
-  SEARCH_SERVICE_URL: process.env.POST_SERVICE_URL || 'http://localhost:8084',
+  MEDIA_SERVICE_URL: process.env.MEDIA_SERVICE_URL || 'http://localhost:8082',
+  SEARCH_SERVICE_URL: process.env.SEARCH_SERVICE_URL || 'http://localhost:8084',
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
   JWT_SECRET: process.env.JWT_SECRET || '',
 };
