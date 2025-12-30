@@ -8,5 +8,6 @@ router.use(isAuthenticated);
 
 router.post('/create-post', createPost);
 router.get('/posts', getAllPost);
+router.get('/:id', getPost);
 
 export default router;

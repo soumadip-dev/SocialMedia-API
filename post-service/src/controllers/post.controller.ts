@@ -106,6 +106,49 @@ const getAllPost = async (req: Request, res: Response<MessageResponse | ErrorRes
 const getPost = async (req: Request, res: Response<MessageResponse | ErrorResponse>) => {
   logger.info('Get post endpoint hit 🎯');
   try {
+    const { id: postIdParam } = req.params;
+
+    if (!postIdParam) {
+      logger.warn('Post ID not provided ⚠️');
+      return res.status(400).json({
+        success: false,
+        message: 'Post id is required',
+      });
+    }
+
+    const cacheKey = `Post:${postIdParam}`;
+    const cachedPost = await req.redisClient?.get(cacheKey);
+
+    if (cachedPost) {
+      logger.info('Post fetched from Redis cache ⚡');
+      return res.status(200).json({
+        success: true,
+        message: 'Post fetched successfully!',
+        data: JSON.parse(cachedPost),
+      });
+    }
+
+    const post = await Post.findById(postIdParam);
+
+    if (!post) {
+      logger.warn(`Post not found for id: ${postIdParam} ⚠️`);
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found',
+      });
+    }
+
+    await req.redisClient?.setex(cacheKey, 3600, JSON.stringify(post));
+
+    logger.info(
+      `Post fetched successfully for id ${postIdParam} from database and cached successfully ✅`
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: 'Post fetched successfully!',
+      data: post,
+    });
   } catch (error) {
     logger.error('Error fetching post ❌', error);
     return res.status(500).json({
