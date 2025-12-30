@@ -37,6 +37,7 @@ const createPost = async (req: Request, res: Response<MessageResponse | ErrorRes
     return res.status(201).json({
       message: 'Post created successfully!',
       success: true,
+      data: newlyCreatedPost,
     });
   } catch (error) {
     logger.error('Error during post creation ❌', error);
@@ -163,6 +164,36 @@ const getPost = async (req: Request, res: Response<MessageResponse | ErrorRespon
 const deletePost = async (req: Request, res: Response<MessageResponse | ErrorResponse>) => {
   logger.info('Delete post endpoint hit 🎯');
   try {
+    const { id: postIdParam } = req.params;
+    const createdBy = req.user?.userId;
+
+    if (!postIdParam) {
+      logger.warn('Post ID not provided ⚠️');
+      return res.status(400).json({
+        success: false,
+        message: 'Post id is required',
+      });
+    }
+
+    const deletedPost = await Post.findOneAndDelete({ _id: postIdParam, user: createdBy });
+
+    if (!deletedPost) {
+      logger.warn(`Post not found for id: ${postIdParam} ⚠️`);
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found',
+      });
+    }
+
+    await invalidatePostsCache(req, deletedPost._id.toString());
+
+    logger.info(`Post deleted successfully ${deletedPost} ✅`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Post deleted successfully!',
+      data: deletedPost,
+    });
   } catch (error) {
     logger.error('Error deleting post ❌', error);
     return res.status(500).json({

@@ -7,10 +7,19 @@ export async function invalidatePostsCache(req: Request, input: string): Promise
     logger.warn('Redis client not available. Skipping posts cache invalidation.❌');
     return;
   }
+  try {
+    const PostPaginatedkeys = await redis.keys('posts:*');
+    const postSpecificKey = `Post:${input}`;
 
-  const keys = await redis.keys('posts:*');
-  if (keys.length > 0) {
-    await redis.del(keys);
+    const pipeline = redis.multi();
+    if (PostPaginatedkeys.length > 0) {
+      pipeline.del(...PostPaginatedkeys);
+    }
+    pipeline.del(postSpecificKey);
+
+    await pipeline.exec();
+    logger.info(`Invalidated posts cache. Keys removed 🗑️`);
+  } catch (error) {
+    logger.error('Error invalidating posts cache ❌:', error);
   }
-  logger.info(`Invalidated posts cache. Keys removed 🗑️`);
 }
