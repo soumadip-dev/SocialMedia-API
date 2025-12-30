@@ -11,4 +11,7 @@ export const ENV = {
   REDIS_URL: process.env.REDIS_URL || '',
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
   MONGO_URI: process.env.MONGO_URI || '',
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || '',
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || '',
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || '',
 };

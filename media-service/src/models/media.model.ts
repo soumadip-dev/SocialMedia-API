@@ -37,8 +37,6 @@ const mediaSchema = new mongoose.Schema<IMedia>(
   { timestamps: true }
 );
 
-mediaSchema.index({ content: 'text' }); // It is optional because search is handled by another service.
-
 //* Mongoose model for Post
 const Media: Model<IMedia> = mongoose.models.Media || mongoose.model<IMedia>('Media', mediaSchema);
 
