@@ -63,8 +63,27 @@ const getAllMedias = async (req: Request, res: Response<MessageResponse | ErrorR
   logger.info('Get all medias endpoint hit 🎯');
 
   try {
+    logger.info('🔍 Retrieving media records for authenticated user');
+
+    const medias = await Media.find({ userId: req.user?.userId });
+
+    if (medias.length === 0) {
+      logger.warn('⚠️ No media records found for the current user');
+      return res.status(404).json({
+        success: false,
+        message: "Can't find any media for this user",
+      });
+    }
+
+    logger.info(`📦 Successfully fetched ${medias.length} media records`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Medias fetched successfully',
+      data: medias,
+    });
   } catch (error) {
-    logger.error('Error occurred while fetching medias ❌', error);
+    logger.error('❌ Failed to fetch medias due to an error', error);
     return res.status(500).json({
       message: 'Post creation failed due to a server error',
       success: false,
