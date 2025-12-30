@@ -34,7 +34,6 @@ const createPost = async (req: Request, res: Response<MessageResponse | ErrorRes
     return res.status(201).json({
       message: 'Post created successfully!',
       success: true,
-      data: {},
     });
   } catch (error) {
     logger.error('Error during post creation ❌', error);
@@ -49,12 +48,52 @@ const createPost = async (req: Request, res: Response<MessageResponse | ErrorRes
 //* Controller to get all posts
 const getAllPost = async (req: Request, res: Response<MessageResponse | ErrorResponse>) => {
   logger.info('Get all posts endpoint hit 🎯');
+
   try {
+    const page = typeof req.query.page === 'string' ? parseInt(req.query.page, 10) : 1;
+    const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 10;
+
+    const startIndex = (page - 1) * limit;
+    const cacheKey = `posts:${page}:${limit}`;
+
+    // Check Redis cache
+    const cachedPosts = await req.redisClient?.get(cacheKey);
+    if (cachedPosts) {
+      logger.info('Posts fetched from Redis cache ⚡');
+      return res.status(200).json({
+        success: true,
+        message: 'Posts fetched successfully!',
+        data: JSON.parse(cachedPosts),
+      });
+    }
+
+    // Fetch posts from database
+    const posts = await Post.find({}).sort({ createdAt: -1 }).skip(startIndex).limit(limit);
+
+    const totalNumberOfPosts = await Post.countDocuments();
+
+    const result = {
+      posts,
+      currentPage: page,
+      totalPages: Math.ceil(totalNumberOfPosts / limit),
+      totalPosts: totalNumberOfPosts,
+    };
+
+    // Save result in Redis cache for 5 minutes
+    await req.redisClient?.setex(cacheKey, 300, JSON.stringify(result));
+
+    logger.info('Posts fetched from database and cached successfully ✅');
+
+    return res.status(200).json({
+      success: true,
+      message: 'Posts fetched successfully!',
+      data: result,
+    });
   } catch (error) {
     logger.error('Error fetching posts ❌', error);
     return res.status(500).json({
-      message: 'Fetching posts failed due to a server error',
       success: false,
+      message: 'Fetching posts failed due to a server error',
       errors: error instanceof Error ? [error.message] : undefined,
     });
   }

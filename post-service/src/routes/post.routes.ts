@@ -7,5 +7,6 @@ const router = Router();
 router.use(isAuthenticated);
 
 router.post('/create-post', createPost);
+router.get('/posts', getAllPost);
 
 export default router;
