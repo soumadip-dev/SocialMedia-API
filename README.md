@@ -104,6 +104,29 @@
 
 ---
 
+## 🔌 API Endpoints
+
+### Authentication
+
+- `POST /api/v1/auth/register` – Register a new user
+- `POST /api/v1/auth/login` – Log in a user
+- `POST /api/v1/auth/refresh-token` – Refresh access token
+- `POST /api/v1/auth/logout` – Log out a user
+
+### Posts
+
+- `POST /api/v1/post/create-post` – Create a new post
+- `GET /api/v1/post/posts?page=&limit=` – Get all posts (paginated)
+- `GET /api/v1/post/:id` – Get a post by ID
+- `DELETE /api/v1/post/:id` – Delete a post by ID
+
+### Media
+
+- `GET /api/v1/media` – Get all media files
+- `POST /api/v1/media/upload` – Upload media
+
+---
+
 ## 🤸 Installation & Setup
 
 ### Prerequisites
@@ -146,30 +169,3 @@ REDIS_URL=redis://localhost:6379
 ```
 
 ---
-
-## 🔌 API Endpoints
-
-### Authentication
-
-- `POST /api/v1/auth/register` – Register a new user
-- `POST /api/v1/auth/login` – Log in a user
-- `POST /api/v1/auth/refresh-token` – Refresh access token
-- `POST /api/v1/auth/logout` – Log out a user
-
-### Posts
-
-- `POST /api/v1/post/create-post` – Create a new post
-- `GET /api/v1/post/posts?page=&limit=` – Get all posts (paginated)
-- `GET /api/v1/post/:id` – Get a post by ID
-- `DELETE /api/v1/post/:id` – Delete a post by ID
-
-### Media
-
-- `GET /api/v1/media` – Get all media files
-- `POST /api/v1/media/upload` – Upload media
-
----
-
-<p align="center">
-  Made with ❤️ by Soumadip Majila
-</p>

@@ -15,11 +15,20 @@ async function connectToRabbitMQ() {
     channel = await connection.createChannel();
 
     await channel.assertExchange(EXCHANGE_NAME, 'topic', { durable: false });
-    logger.info('Connected to rabbit mq');
+    logger.info('Connected to rabbit mq ✅');
     return channel;
   } catch (e) {
-    logger.error('Error connecting to rabbit mq', e);
+    logger.error('Error connecting to rabbit mq ❌', e);
   }
 }
 
-export { connectToRabbitMQ };
+async function publishEvent(routingKey: string, message: unknown) {
+  if (!channel) {
+    await connectToRabbitMQ();
+  }
+
+  channel && channel.publish(EXCHANGE_NAME, routingKey, Buffer.from(JSON.stringify(message)));
+  logger.info(`Event published: ${routingKey} ✅`);
+}
+
+export { connectToRabbitMQ, publishEvent };
