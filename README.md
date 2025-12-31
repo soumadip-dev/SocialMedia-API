@@ -8,17 +8,13 @@
 
 ## 🔋 Key Features
 
-- **🔐 Secure Authentication** – JWT-based authentication with refresh tokens
-- **👥 User Management** – Complete CRUD operations for user profiles
-- **📱 Post & Content System** – Create, read, update, and delete posts with media support
-- **💬 Real-time Messaging** – WebSocket-based chat system with message persistence
-- **👍 Engagement Features** – Like, comment, and share functionality
-- **🔍 Advanced Search** – Elasticsearch-powered content discovery
-- **📊 Analytics Dashboard** – User activity and engagement metrics
-- **⚡ Performance Optimized** – Redis caching for frequently accessed data
-- **🛡️ Rate Limiting** – Protect against abuse with configurable rate limits
-- **📨 Notification System** – Real-time push and email notifications
-- **🔄 Microservice Architecture** – Independently deployable services
+- **🔐 Secure Authentication** – JWT-based authentication with access and refresh tokens
+- **🧾 User Registration & Login** – User signup, login, logout, and token refresh functionality
+- **📝 Post Management System** – Create, retrieve (single & paginated), and delete posts
+- **🗂️ Media Handling** – Upload media files and fetch uploaded media
+- **⚡ Performance Optimized** – Redis caching for tokens and frequently accessed data
+- **🛡️ API Security** – Rate limiting, Helmet, and CORS protection
+- **🔄 Microservice Architecture** – API Gateway with independently deployable services
 
 ---
 
@@ -115,6 +111,7 @@
 - Node.js (v18 or higher)
 - Redis (v7+)
 - MongoDB (v6+)
+- Erlang/OTP (v28.3)
 - RabbitMQ (v3.12+)
 - Docker & Docker Compose (optional)
 
@@ -150,18 +147,26 @@ REDIS_URL=redis://localhost:6379
 
 ---
 
-## 🚀 API Endpoints
+## 🔌 API Endpoints
 
 ### Authentication
 
-- `POST /api/v1/auth/register` – Register new user
-- `POST /api/v1/auth/login` – Login user
+- `POST /api/v1/auth/register` – Register a new user
+- `POST /api/v1/auth/login` – Log in a user
 - `POST /api/v1/auth/refresh-token` – Refresh access token
-- `POST /api/v1/auth/logout` – Logout user
+- `POST /api/v1/auth/logout` – Log out a user
 
-### Post
+### Posts
 
-- `POST /api/v1/post/create-post` – Create new Post
+- `POST /api/v1/post/create-post` – Create a new post
+- `GET /api/v1/post/posts?page=&limit=` – Get all posts (paginated)
+- `GET /api/v1/post/:id` – Get a post by ID
+- `DELETE /api/v1/post/:id` – Delete a post by ID
+
+### Media
+
+- `GET /api/v1/media` – Get all media files
+- `POST /api/v1/media/upload` – Upload media
 
 ---
 
