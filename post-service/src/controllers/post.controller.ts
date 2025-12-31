@@ -5,6 +5,7 @@ import logger from '../utils/logger.utils';
 import { Post } from '../models/post.model';
 import { validatePost } from '../utils/validation.utils';
 import { invalidatePostsCache } from '../utils/redis-cache.utils';
+import { publishEvent } from '../utils/rabbitmq.utils';
 
 //* Controller to create a post
 const createPost = async (req: Request, res: Response<MessageResponse | ErrorResponse>) => {
@@ -184,6 +185,13 @@ const deletePost = async (req: Request, res: Response<MessageResponse | ErrorRes
         message: 'Post not found',
       });
     }
+
+    // publish post delete method
+    await publishEvent('post.deleted', {
+      pstId: deletedPost._id.toString(),
+      userId: req.user?.userId,
+      mediaIds: deletedPost.mediaIds,
+    });
 
     await invalidatePostsCache(req, deletedPost._id.toString());
 
