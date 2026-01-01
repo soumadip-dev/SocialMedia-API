@@ -1,8 +1,12 @@
 import app from './app.js';
 import { connectDB } from './config/db.config.js';
 import { ENV } from './config/env.config.js';
+import {
+  handlePostCreatedEvent,
+  handlePostDeletedEvent,
+} from './events/post.create-delete.consumer.js';
 import logger from './utils/logger.utils.js';
-import { connectToRabbitMQ } from './utils/rabbitmq.utils.js';
+import { connectToRabbitMQ, consumeEvent } from './utils/rabbitmq.utils.js';
 
 const PORT = ENV.PORT;
 
@@ -18,6 +22,11 @@ const startServer = async () => {
 
     // Connect to RabbitMQ
     await connectToRabbitMQ();
+
+    // consume all the events
+    await consumeEvent('post.deleted', handlePostDeletedEvent);
+    await consumeEvent('post.created', handlePostCreatedEvent);
+
     // Start the server
     const server = app.listen(PORT, () => {
       logger.info(`Search service running on http://localhost:${PORT} 🌐`);
