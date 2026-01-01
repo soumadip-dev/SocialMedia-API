@@ -8,6 +8,7 @@ import Redis from 'ioredis';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 
 import healthRoutes from './routes/health.routes.js';
+import searchRoutes from './routes/search.routes';
 import configureCors from './config/cors.config.js';
 import logger from './utils/logger.utils.js';
 import { ENV } from './config/env.config.js';
@@ -58,6 +59,7 @@ app.get('/', (req: Request, res: Response<MessageResponse>) => {
 
 // Routes
 app.use('/api/health', healthRoutes);
+app.use('/api/search', searchRoutes);
 
 app.use(errorHandler);
 
