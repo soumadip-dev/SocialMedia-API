@@ -54,4 +54,54 @@ async function publishEvent(routingKey: string, message: unknown) {
   logger.info(`Event published successfully | routingKey="${routingKey}" 🚀`);
 }
 
-export { connectToRabbitMQ, publishEvent };
+//* Subscribes to events matching a routing key
+async function consumeEvent<T>(routingKey: string, callback: (data: T) => void) {
+  if (!channel) {
+    logger.warn('No active RabbitMQ channel found. Reconnecting... 🔄');
+    await connectToRabbitMQ();
+  }
+
+  if (!channel) {
+    logger.error('Event subscription failed: RabbitMQ channel unavailable ❌');
+    return;
+  }
+
+  /**
+   * Create a temporary, exclusive queue.
+   * - Empty name: RabbitMQ generates a unique queue name
+   * - Exclusive: Queue is deleted when the connection closes
+   */
+  const q = await channel.assertQueue('', { exclusive: true });
+
+  // Bind the queue to the exchange using the routing key
+  await channel.bindQueue(q.queue, EXCHANGE_NAME, routingKey);
+
+  logger.info(`Queue bound to exchange "${EXCHANGE_NAME}" with routingKey="${routingKey}" 🔗`);
+
+  // Start consuming messages from the queue
+  channel.consume(q.queue, msg => {
+    if (!msg) {
+      logger.warn('Received empty message from RabbitMQ ⚠️');
+      return;
+    }
+
+    try {
+      // Parse message content
+      const content = JSON.parse(msg.content.toString()) as T;
+
+      // Execute user-provided callback
+      callback(content);
+
+      // Acknowledge message so RabbitMQ can remove it from the queue
+      channel?.ack(msg);
+
+      logger.debug(`Message processed successfully | routingKey="${routingKey}" ✅`);
+    } catch (error) {
+      logger.error('Failed to process RabbitMQ message ❌', error);
+    }
+  });
+
+  logger.info(`Subscribed to events | routingKey="${routingKey}" 📥`);
+}
+
+export { connectToRabbitMQ, publishEvent, consumeEvent };
