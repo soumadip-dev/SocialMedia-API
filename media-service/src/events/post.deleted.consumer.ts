@@ -10,7 +10,7 @@ interface IPostDeletedEvent {
 }
 
 const handlePostDeletedEvent = async (event: IPostDeletedEvent): Promise<void> => {
-  const { mediaIds } = event;
+  const { mediaIds, postId } = event;
 
   try {
     const mediaList = await Media.find({ _id: { $in: mediaIds } });
@@ -19,12 +19,12 @@ const handlePostDeletedEvent = async (event: IPostDeletedEvent): Promise<void> =
       await deleteMediaFromCloudinary(media.publicId);
       await Media.findByIdAndDelete(media._id);
 
-      logger.info(`Deleted media ${media._id} associated with deleted post 🗑️`);
+      logger.info(`🗑️ Media deleted | MediaID: ${media._id} | PostID: ${postId}`);
     }
 
-    logger.info(`Successfully processed media deletion for the post ✅`);
+    logger.info(`✅ Media deletion completed successfully | PostID: ${postId}`);
   } catch (error) {
-    logger.error('Error occurred while deleting media for post ❌', error);
+    logger.error(`❌ Failed to delete media for post | PostID: ${postId}`, error);
   }
 };
 
