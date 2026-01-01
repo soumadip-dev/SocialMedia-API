@@ -28,7 +28,7 @@ function buildIpRateLimiter(windowMs: number, maxRequests: number): RateLimitReq
     standardHeaders: true,
     legacyHeaders: false,
     handler: (req: Request, res: Response<ErrorResponse>) => {
-      logger.warn(`Sensitive endpoint rate limit exceeded for IP: ${req.ip}`);
+      logger.warn(`Sensitive endpoint rate limit exceeded for IP: ${req.ip} 🚫`);
       res.status(429).json({
         success: false,
         message: 'Too many requests',
