@@ -1,4 +1,4 @@
-import app from './app.js';
+import { app } from './app.js';
 import { connectDB } from './config/db.config.js';
 import { ENV } from './config/env.config.js';
 import {

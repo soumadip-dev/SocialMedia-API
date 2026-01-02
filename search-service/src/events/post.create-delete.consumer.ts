@@ -1,6 +1,8 @@
 import logger from '../utils/logger.utils';
 import { Search } from '../models/search.model';
 import mongoose from 'mongoose';
+import { invalidateSearchCache } from '../utils/redis-cache.utils';
+import { redisClient } from '../app';
 
 interface IPostCreatedEvent {
   postId: string;
@@ -20,6 +22,8 @@ const handlePostCreatedEvent = async (event: IPostCreatedEvent): Promise<void> =
   const { postId, userId, content, createdAt } = event;
 
   try {
+    await invalidateSearchCache(redisClient);
+
     const newSearchPost = new Search({
       postId,
       userId,
@@ -42,6 +46,7 @@ const handlePostDeletedEvent = async (event: IPostDeletedEvent): Promise<void> =
   const { postId } = event;
 
   try {
+    await invalidateSearchCache(redisClient);
     const deleted = await Search.findOneAndDelete({ postId });
 
     if (deleted) {

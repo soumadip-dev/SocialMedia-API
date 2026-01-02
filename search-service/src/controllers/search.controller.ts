@@ -3,6 +3,7 @@ import { MessageResponse } from '../interfaces/message-response';
 import { ErrorResponse } from '../interfaces/error-response';
 import logger from '../utils/logger.utils';
 import { Search } from '../models/search.model';
+import { redisClient } from '../app';
 
 //* Controller to search posts
 const searchPostController = async (
@@ -19,6 +20,18 @@ const searchPostController = async (
         message: 'Query must be a non-empty string',
       });
     }
+    const cacheKey = `search:${query}`;
+
+    const cachedSearchResults = await redisClient?.get(cacheKey);
+
+    if (cachedSearchResults) {
+      logger.info('Searching from Redis cache ⚡');
+      return res.status(200).json({
+        success: true,
+        message: 'Posts retrieved successfully',
+        data: JSON.parse(cachedSearchResults),
+      });
+    }
 
     const searchResults = await Search.find(
       {
@@ -31,7 +44,10 @@ const searchPostController = async (
       .sort({ score: { $meta: 'textScore' } })
       .limit(10);
 
-    logger.info('Search results fetched successfully ✅');
+    // Save searchResult in Redis cache for 5 minutes
+    await redisClient?.setex(cacheKey, 300, JSON.stringify(searchResults));
+
+    logger.info('Search results fetched from database and cached successfully ✅');
 
     return res.status(200).json({
       success: true,

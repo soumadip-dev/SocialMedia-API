@@ -63,4 +63,4 @@ app.use('/api/search', searchRoutes);
 
 app.use(errorHandler);
 
-export default app;
+export { redisClient, app };
