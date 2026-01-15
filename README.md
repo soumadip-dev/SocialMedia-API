@@ -4,9 +4,13 @@
   A scalable social media backend service built with Express.js, Redis, RabbitMQ, and modern tools, featuring rate limiting and a microservice architecture with asynchronous messaging.
 </p>
 
+<div align="center">
+  <img src="./banner.png" alt="Banner" width="900">
+</div>
+
 ---
 
-## 🔋 Key Features
+## 🔋 Features
 
 - **🔐 Secure Authentication** – JWT-based authentication with access and refresh tokens
 - **🧾 User Registration & Login** – User signup, login, logout, and token refresh functionality
